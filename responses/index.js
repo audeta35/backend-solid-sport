@@ -1,5 +1,13 @@
 'use strict';
 
+exports.root = (res) => {
+    res.send({
+        status : "root",
+        message : "welcome to solidsport api",
+        code: 200
+    })
+}
+
 exports.success = (res, value) => {
   const result = {
     status: {
