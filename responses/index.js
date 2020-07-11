@@ -28,3 +28,18 @@ exports.notFound = res => {
   res.status(404).json(result);
   res.end();
 };
+
+exports.loginFailed = (res) => {
+  res.status(403).send({
+    status: 403,
+    message: "Username Atau Password Salah",
+  });
+};
+
+exports.loginSuccess = (res, rows, token) => {
+  res.status(200).send({
+    status: 200,
+    result: rows,
+    token: token
+  });
+};
