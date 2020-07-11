@@ -24,10 +24,27 @@ exports.loginUsers = (req, res) => {
           return res.status(422).send(err);
         } else {
           if (users.length === 1) {
+            let updateStatus = `UPDATE users SET status=?, token=? WHERE id_user=?`;
+            let status = "online";
+            let id_user = users[0].id_user;
             const token = jwt.sign({ users }, process.env.JWT_KEY, {
               expiresIn: "12h",
             });
-            return response.loginSuccess(res, users, token);
+            conn.query(updateStatus, [status, token, id_user],(err, result, field) => {
+              if(err) {
+                return res.status(422).send(err);
+              }
+              else {
+                conn.query(loginUser, [username, password], (err, users, field) => {
+                  if(err) {
+                    res.status(422).send(err);
+                  }
+                  else {
+                    return response.loginSuccess(res, users, token);
+                  }
+                })
+              }
+            })
           } else {
             return response.loginFailed(res);
           }
@@ -44,10 +61,50 @@ exports.loginAdmin = (req, res) => {
       return res.status(422).send(err);
     } else {
       if (users.length === 1) {
-        return response.loginSuccess(res, users);
+        let updateStatus = `UPDATE users SET status=?, token=? WHERE id_user=?`;
+        let status = "online";
+        let id_user = users[0].id_user;
+        const token = jwt.sign({ users }, process.env.JWT_KEY, {
+          expiresIn: "12h",
+        });
+        conn.query(
+          updateStatus,
+          [status, token, id_user],
+          (err, result, field) => {
+            if (err) {
+              return res.status(422).send(err);
+            } else {
+              conn.query(
+                loginUser,
+                [username, password],
+                (err, users, field) => {
+                  if (err) {
+                    res.status(422).send(err);
+                  } else {
+                    return response.loginSuccess(res, users, token);
+                  }
+                }
+              );
+            }
+          }
+        );
       } else {
         return response.loginFailed(res);
       }
     }
   });
 };
+
+exports.logOut = (req, res) => {
+  let { id_user } = req.body;
+  let status = "offline";
+  let logout = `UPDATE users SET token="", status=? WHERE id_user=?`;
+  conn.query(logout, [status, id_user], (err, result, field) => {
+    if(err) {
+      return res.status(422).send(err);
+    } 
+    else if(result) {
+      return response.success(res, result);
+    }
+  })
+}
