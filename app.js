@@ -36,16 +36,33 @@ const users = {}
 io.on("connection", (socket) => {
   console.log("welcome user");
   
-  socket.on("login", function (data) {
-    console.log("a user " + data.userId + " connected");
+  socket.on("login", function (user) {
+    console.log("a user " + user.name + " connected");
     // saving userId to array with socket ID
-    users[socket.id] = data.userId;
+    users[socket.id] = user.id_user;
+
+    let status = "online";
+    let updateStatus = `UPDATE users SET status=? WHERE id_user=?`;
+    conn.query(updateStatus, [status, user.id_user], (err, result, field) => {
+      socket.join('getStatus');
+      io.in('getStatus').emit('getStatus');
+    })
+
   });
 
   socket.on("disconnect", function () {
     console.log("user " + users[socket.id] + " disconnected");
-    // remove saved socket from users object
-    delete users[socket.id];
+
+    if(users[socket.id]) {
+      let status = "offline";
+      let updateStatus = `UPDATE users SET status=? WHERE id_user=?`;
+      conn.query(updateStatus, [status, users[socket.id]], (err, result, field) => {
+        socket.join("getStatus");
+        io.in("getStatus").emit("getStatus2");
+        // remove saved socket from users object
+        delete users[socket.id];
+      });
+    }
   });
 });
 
