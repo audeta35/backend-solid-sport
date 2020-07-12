@@ -29,6 +29,18 @@ exports.addAllUsers = (req, res) => {
   })
 }
 
+exports.editUser = (req, res) => {
+  let { username, position, tatami, id } = req.body;
+  let editQuery = `UPDATE users SET username=?, name=?, tatami=? WHERE id_user=?`;
+
+  conn.query(editQuery, [username, position, tatami, id], (err, result, field) => {
+    if (err) { return res.status(422).send(err) }
+    else {
+      response.success(res, result);
+    }
+  })
+}
+
 exports.loginUsers = (req, res) => {
     let {username, password} = req.body;
     let loginUser = `SELECT * FROM users WHERE username=? AND password=? AND level=0`;
