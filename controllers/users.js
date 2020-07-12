@@ -41,6 +41,19 @@ exports.editUser = (req, res) => {
   })
 }
 
+exports.deleteUser = (req, res) => {
+  let {id} = req.params;
+  let deleteQuery = `DELETE FROM users WHERE id_user=?`;
+
+  conn.query(deleteQuery, [id], (err, result, field) => {
+    if(err) { return res.status(422).send(err) }
+    else {
+      response.success(res, result);
+    }
+  })
+  
+}
+
 exports.loginUsers = (req, res) => {
     let {username, password} = req.body;
     let loginUser = `SELECT * FROM users WHERE username=? AND password=? AND level=0`;

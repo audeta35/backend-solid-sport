@@ -5,6 +5,7 @@ const usersController = require("../controllers/users");
 routes.get("/", usersController.getAllUsers);
 routes.post("/add", usersController.addAllUsers);
 routes.put("/edit", usersController.editUser);
+routes.delete("/delete/:id", usersController.deleteUser);
 
 // Autentikasi
 
