@@ -16,6 +16,19 @@ exports.getAllUsers = (req, res) => {
     })
 };
 
+exports.addAllUsers = (req, res) => {
+  let {username, password, position, tatami, level} = req.body;
+  let status = "offline";
+  let addUser = `INSERT INTO users SET token="", tatami=?, name=?, username=?, password=?, level=?, status=?`
+
+  conn.query(addUser, [tatami, position, username, password, level, status], (err, result, field) => {
+    if(err) { return res.status(422).send(err) }
+    else {
+      response.success(res, result);
+    }
+  })
+}
+
 exports.loginUsers = (req, res) => {
     let {username, password} = req.body;
     let loginUser = `SELECT * FROM users WHERE username=? AND password=? AND level=0`;
