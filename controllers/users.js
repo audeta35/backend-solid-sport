@@ -6,7 +6,7 @@ const conn = require("../config/database");
 const jwt = require("jsonwebtoken");
 
 exports.getAllUsers = (req, res) => {
-    let {level} = req.body;
+    let level = 0;
     let getUser = `SELECT * FROM users WHERE level=?`;
     conn.query(getUser, [level], (err, users, field) => {
         if(!err) {
@@ -16,6 +16,19 @@ exports.getAllUsers = (req, res) => {
         }
     })
 };
+
+exports.getAllAdmin = (req, res) => {
+  let level = 1;
+  let getUser = `SELECT * FROM users WHERE level=?`;
+  conn.query(getUser, [level], (err, users, field) => {
+    if (!err) {
+      response.success(res, users);
+    } else {
+      res.status(422).send(err);
+    }
+  });
+};
+
 
 exports.addAllUsers = (req, res) => {
   let {username, password, position, tatami, level} = req.body;
