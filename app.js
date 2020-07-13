@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
   console.log("welcome user");
   
   socket.on("login", function (user) {
-    console.log("a user " + user.name + " connected");
+    console.log(`${user.username} logged in as ${user.name}`);
     // saving userId to array with socket ID
     users[socket.id] = user.id_user;
 
@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", function () {
-    console.log("user " + users[socket.id] + " disconnected");
+    console.log("user with id: " + users[socket.id] + " disconnected");
 
     if(users[socket.id]) {
       let status = "offline";
