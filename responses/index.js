@@ -43,3 +43,14 @@ exports.loginSuccess = (res, rows, token) => {
     token: token
   });
 };
+
+exports.falseRequirement = (res, field) => {
+  const result = {
+    status: {
+      code: 500,
+      message: 'Form ' + field + ' tidak boleh kosong.'
+    }
+  };
+  res.status(500).json({ results: result });
+  res.end();
+};
