@@ -1,5 +1,7 @@
 'use strict';
 
+// dev response
+
 exports.root = (res) => {
     res.send({
         status : "root",
@@ -7,6 +9,16 @@ exports.root = (res) => {
         code: 200
     })
 }
+
+exports.debug = (res, message) => {
+  res.send({
+    status: "debuging",
+    message: message,
+    code: 200
+  })
+}
+
+// prod response
 
 exports.success = (res, value) => {
   const result = {
