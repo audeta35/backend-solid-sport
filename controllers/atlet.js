@@ -2,8 +2,33 @@
 
 const response = require("../responses/index");
 const conn = require("../config/database");
+const multer = require('multer');
+const csv = require('csvtojson')
+const path = require('path');
 
 require('dotenv').config();
+
+// UPLOAD FOR ADD USER WITH IMPORT CSV
+const storageCSV = multer.diskStorage({
+destination: (req, res, callback) => {
+    callback(null, 'uploads');
+},
+filename: (req, file, callback) => {
+    callback(null, file.originalname);
+}
+});
+
+let uploadCSV = multer({ 
+storage: storageCSV ,
+fileFilter: function (req, file, callback) {
+    var ext = path.extname(file.originalname);
+    if(ext !== '.csv' && ext !== '.xlsx') {
+    req.fileValidationError= 'goes wrong on the mimetype';
+        return callback(null, false, new Error('File must be CSV or XLSX format mimtype'))
+    }
+    callback(null, true)
+}
+}).single('file');
 
 exports.addAtletHth = (req, res) => {
     let {payload} = req.body;
@@ -111,6 +136,47 @@ exports.getAtlet = (req, res) => {
             })
         } else {
             res.status(422).send(err);
+        }
+    })
+}
+
+exports.importGrouping = (req, res) => {
+    uploadCSV(req, res, (err) => {
+        if(err) {
+            return res.end('Error uploading file');
+        }
+
+        const file = req.file;
+        if(!file) {
+            return response.falseRequirement(res, 'File');
+        } else {
+            let filename = file.originalname;
+            let filePath = './uploads/'+ filename;
+
+            csv()
+            .fromFile(filePath)
+            .then((data)=>{
+                for(let i in data) {
+                    const result = data[i];
+
+                    let query = `INSERT INTO athlete SET atlet_name=?, kontingen=?, class=?, kata_name=?, grouping=?, attribute=?`;
+                    conn.query(query, [result['nama atlet'], result.kontingen, result.kelas, result['nama kata'], result.grup, result.atribut],
+                    (err, result) => {
+                        if(err) {
+                            return res.status(422).send(err);
+                        }
+                        if(i == data.length - 1) {
+                            let qSelectAthlete = `SELECT *FROM athlete`;
+                            conn.query(qSelectAthlete, (err, athleteList) => {
+                                if(err) {
+                                    return res.status(422).send(err);
+                                }
+                                return response.success(res, athleteList);
+                            })
+                        }                        
+                    })
+                }
+            })
         }
     })
 }

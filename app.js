@@ -11,6 +11,7 @@ const indexRoutes = require('./routes/index');
 const userRoutes = require('./routes/users');
 const atletRoutes = require('./routes/atlet');
 const matchRoutes = require("./routes/match");
+const pointsRoutes = require('./routes/points');
 
 server.use(function (req, res, next) {
   req.io = io;
@@ -23,13 +24,13 @@ server.use(bodyParser.json());
 let whiteList = ["http://localhost:4200", "http://localhost:3000"];
 server.use(
   cors({
-    origin: (origin, cb) => {
-      if (whiteList.indexOf(origin) !== -1) {
-        cb(null, true);
-      } else {
-        cb(new Error("Not allowed by CORS"));
-      }
-    },
+    // origin: (origin, cb) => {
+    //   if (whiteList.indexOf(origin) !== -1) {
+    //     cb(null, true);
+    //   } else {
+    //     cb(new Error("Not allowed by CORS"));
+    //   }
+    // },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
 );
@@ -73,6 +74,7 @@ server.use('/', indexRoutes);
 server.use('/users', userRoutes);
 server.use('/atlet', atletRoutes);
 server.use("/match", matchRoutes);
+server.use('/points', pointsRoutes);
 
 app.listen(port);
 console.log(`Server listening on port ${port}`);

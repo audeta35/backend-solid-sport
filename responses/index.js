@@ -32,6 +32,13 @@ exports.success = (res, value) => {
   res.end();
 };
 
+exports.invalid = (res, status) => {
+  res.status(400).json({
+    status: 400,
+    message: 'Invalid ' + status
+  });
+};
+
 exports.notFound = res => {
   const result = {
     code: 404,
