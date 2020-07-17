@@ -16,6 +16,27 @@ exports.getAllMatch = (req, res) => {
     })
 }
 
+exports.updateMatch = (req, res) => {
+  let {id} = req.body;
+  let status = 2;
+  let query = "UPDATE athlete SET status=? WHERE id_atlet=?";
+  let query2 = "UPDATE `match` SET status=? WHERE id_atlet=?";
+  
+  conn.query(query, [status, id], (err, result, field) => {
+    if(!err) {
+      conn.query(query2, [status, id], (err, result2, field) => {
+        if(!err) {
+          response.success(res, result);
+        } else {
+          res.status(422).send(err);
+        }
+      })
+    } else {
+      res.status(422).send(err);
+    }
+  })
+}
+
 exports.addMatchGroup = (req, res) => {
     let { atlet } = req.body;
     let status = 1;

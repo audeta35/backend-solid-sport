@@ -53,6 +53,33 @@ io.on("connection", (socket) => {
 
   });
 
+  socket.on("scoreboard", () => {
+    let query = "SELECT * FROM athlete WHERE status=1";
+    conn.query(query, [], (err, atlet, field) => {
+      if(!err) {
+        socket.join("scoreboard");
+        io.in("scoreboard").emit("data-score", atlet);
+      }
+    })
+  })
+
+  socket.on("result-admin", () => {
+
+    // query
+
+    socket.join("result-admin")
+    io.in("result-admin").emit("bebas", /* Value */ );
+  })
+
+  socket.on("result-juri", () => {
+
+    // query
+
+    socket.join("result-juri")
+    io.in("result-juri").emit("bebas", /* Value */ );
+  })
+
+
   socket.on("disconnect", function () {
     console.log("user with id: " + users[socket.id] + " disconnected");
 
@@ -73,7 +100,7 @@ io.on("connection", (socket) => {
 server.use('/', indexRoutes);
 server.use('/users', userRoutes);
 server.use('/atlet', atletRoutes);
-server.use("/match", matchRoutes);
+server.use('/match', matchRoutes);
 server.use('/points', pointsRoutes);
 
 app.listen(port);

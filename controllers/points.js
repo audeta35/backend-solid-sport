@@ -21,7 +21,7 @@ exports.doPointsByUser = (req, res) => {
     } else if(!athValue) {
         return response.falseRequirement(res, 'Penilaian atletik');
     } else {
-        let qValidateUserPoint = `SELECT *FROM result WHERE id_atlet=?`;
+        let qValidateUserPoint = `SELECT * FROM result WHERE id_atlet=?`;
         conn.query(qValidateUserPoint, [ athleteId ],
         (err, userPointList) => {
             if(err) {
