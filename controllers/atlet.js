@@ -9,7 +9,7 @@ exports.addAtletHth = (req, res) => {
     let {payload} = req.body;
     let keys = Object.keys(payload);
     let value = [];
-    let add = `INSERT INTO athlete (atlet_name, kontingen, class, kata_name, grouping, attribute) VALUES ?`;
+    let add = `INSERT INTO athlete (atlet_name, kontingen, class, kata_name, grouping, attribute, status) VALUES ?`;
 
     payload.map((pay) => {
         keys.map((key) => {
@@ -20,6 +20,7 @@ exports.addAtletHth = (req, res) => {
                 payload[key].kata,
                 payload[key].group,
                 payload[key].attribute,
+                0
             ])
         })
     })
@@ -42,7 +43,7 @@ exports.addAtlet = (req, res) => {
     let value = [];
     let value2 = [];
     let addGroup = `INSERT INTO groups (group_name) VALUES ?`;
-    let addAtlet = `INSERT INTO athlete (atlet_name, kontingen, class, kata_name, grouping, attribute) VALUES ?`;
+    let addAtlet = `INSERT INTO athlete (atlet_name, kontingen, class, kata_name, grouping, attribute, status) VALUES ?`;
     let getGroup = 'SELECT * from groups';
 
     keys.map((key) => {
@@ -53,6 +54,7 @@ exports.addAtlet = (req, res) => {
         payload[key].kata,
         payload[key].group,
         payload[key].attribute,
+        0
       ]);
     });
 
@@ -101,7 +103,7 @@ exports.getAtlet = (req, res) => {
                         group: result2
                     }
                     response.success(res, payload);
-                } else if(result2.length === 0) {
+                } else if(result2) {
                     response.success(res, result1);
                 } else {
                     res.status(422).send(err)

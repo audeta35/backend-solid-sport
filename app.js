@@ -10,6 +10,7 @@ const conn = require('./config/database');
 const indexRoutes = require('./routes/index');
 const userRoutes = require('./routes/users');
 const atletRoutes = require('./routes/atlet');
+const matchRoutes = require("./routes/match");
 
 server.use(function (req, res, next) {
   req.io = io;
@@ -71,6 +72,7 @@ io.on("connection", (socket) => {
 server.use('/', indexRoutes);
 server.use('/users', userRoutes);
 server.use('/atlet', atletRoutes);
+server.use("/match", matchRoutes);
 
 app.listen(port);
 console.log(`Server listening on port ${port}`);
