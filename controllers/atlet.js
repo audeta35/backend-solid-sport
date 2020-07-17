@@ -140,6 +140,20 @@ exports.getAtlet = (req, res) => {
     })
 }
 
+exports.getAtletByMatch = (req, res) => {
+
+    let query = "SELECT * FROM `match` LEFT JOIN athlete as a ON a.id_atlet = match.id_atlet";
+    conn.query(query, (err, matchList) => {
+        if(err) {
+            return res.status(422).send(err);
+        }
+        if(matchList.length < 1) {
+            return response.notFound(res);
+        }
+        return response.success(res, matchList);
+    })
+}
+
 exports.importGrouping = (req, res) => {
     uploadCSV(req, res, (err) => {
         if(err) {
@@ -159,8 +173,8 @@ exports.importGrouping = (req, res) => {
                 for(let i in data) {
                     const result = data[i];
 
-                    let query = `INSERT INTO athlete SET atlet_name=?, kontingen=?, class=?, kata_name=?, grouping=?, attribute=?`;
-                    conn.query(query, [result['nama atlet'], result.kontingen, result.kelas, result['nama kata'], result.grup, result.atribut],
+                    let query = `INSERT INTO athlete SET atlet_name=?, kontingen=?, class=?, kata_name=?, grouping=?, attribute=?, status=?`;
+                    conn.query(query, [result['nama atlet'], result.kontingen, result.kelas, result['nama kata'], result.grup, result.atribut, 0],
                     (err, result) => {
                         if(err) {
                             return res.status(422).send(err);
