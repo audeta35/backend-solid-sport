@@ -19,7 +19,7 @@ exports.getAllMatch = (req, res) => {
 exports.addMatchGroup = (req, res) => {
     let { atlet } = req.body;
     let status = 1;
-    let updateStatusAltet = "UPDATE `match` SET status=? WHERE id_atlet=?";
+    let updateStatusAltet = "UPDATE athlete SET status=? WHERE id_atlet=?";
     let addQuery =
       "INSERT INTO `match` SET id_atlet=?, tatami=?, class=?, group_name=?, status=?, round=?";
 
