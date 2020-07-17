@@ -43,46 +43,45 @@ exports.addAtlet = (req, res) => {
     let value2 = [];
     let addGroup = `INSERT INTO groups (group_name) VALUES ?`;
     let addAtlet = `INSERT INTO athlete (atlet_name, kontingen, class, kata_name, grouping, attribute) VALUES ?`;
+    let getGroup = 'SELECT * from groups';
 
-    group.map((grp) => {
-      kiys.map((kiy) => {
-        value2.push([group[kiy].name]);
-      });
+    keys.map((key) => {
+      value.push([
+        payload[key].name,
+        payload[key].kontingen,
+        "none",
+        payload[key].kata,
+        payload[key].group,
+        payload[key].attribute,
+      ]);
     });
 
-    payload.map((pay) => {
-        keys.map((key) => {
-            value.push([
-                payload[key].name,
-                payload[key].kontingen,
-                "none",
-                payload[key].kata,
-                payload[key].group,
-                payload[key].attribute,
-            ]);
-            
-            // value.push({
-            //     atlet_name: payload[key].name,
-            //     kontingen: payload[key].kontingen,
-            //     class: "none",
-            //     kata_name: payload[key].kata,
-            //     grouping: payload[key].group,
-            //     attribute: payload[key].attribute
-            // })
-        })
-    })
-
-    // response.debug(res, value);
-
-    conn.query(addGroup, [value2], (err, result, field) => {
+    conn.query(addAtlet, [value], (err, result1, field) => {
         if(!err) {
-            conn.query(addAtlet, [value], (err, result, field) => {
-              if (!err) {
-                response.success(res, result);
-              } else {
+            conn.query(getGroup, [], (err, result2, field) => {
+            if (!err) {
+                kiys.map((kuy) => {
+                    if (!result2[kuy]) {
+                        value2.push([group[kuy].name]);
+                    }
+                });
+
+                if(value2.length) {
+                    conn.query(addGroup, [value2], (err, result3, field) => {
+                        if(!err) {
+                            response.success(res, result3);
+                        } else {
+                            res.status(422).send(err);   
+                        }
+                    })
+                } else {
+                    response.success(res, result2);
+                }
+
+            } else {
                 res.status(422).send(err);
-              }
-            });
+            }
+            }); 
         } else {
             res.status(422).send(err);
         }
