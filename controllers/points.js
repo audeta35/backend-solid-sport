@@ -122,12 +122,16 @@ exports.doPointsByUser = (req, res) => {
                                                     })
                                                 }
                                                 console.log(pointList)
-                                                const result = {
-                                                    athlete_point_list_: athleteList,
+                                                const boo = {
+                                                    athlete_point_list: athleteList,
+                                                    technical_point_result: technicalPoint,
+                                                    athletic_point_result: athleticPoint,
                                                     total_point: pointList[0].total_point,
-                                                    athlete_profile: pointList
+                                                    athlete_profile: pointList,
+                                                    technical_point: finalTechnicalResult.toFixed(2),
+                                                    athletic_point: finalAthleticResult.toFixed(2),
                                                 }
-                                                return response.success(res, result)
+                                                return response.success(res, boo)
                                             })
                                         })
                                     }
@@ -218,7 +222,7 @@ exports.getPointForScoreboard = (req, res) => {
                     technicalPoint += threeOnTop[i].technical_result;
                     athleticPoint += threeOnTop[i].athletic_result;
     
-                    if(i == threeOnTop.length - 1) {
+                    if(i == threeOnTop.length - 1) {                        
                         finalTechnicalResult = technicalPoint * FAC_TECHNIC;
                         finalAthleticResult = athleticPoint * FAC_ATHLETIC;
     
@@ -247,9 +251,13 @@ exports.getPointForScoreboard = (req, res) => {
                                         message: 'Invalid id points'
                                     })
                                 }
-                                console.log(pointList)
+                                console.log(finalAthleticResult)
                                 const result = {
-                                    athlete_point_list_: athleteList,
+                                    athlete_point_list: athleteList,
+                                    technical_point: finalTechnicalResult.toFixed(2),
+                                    athletic_point: finalAthleticResult.toFixed(2),
+                                    technical_point_result: technicalPoint.toFixed(2),
+                                    athletic_point_result: athleticPoint.toFixed(2),
                                     total_point: pointList[0].total_point,
                                     athlete_profile: pointList
                                 }
