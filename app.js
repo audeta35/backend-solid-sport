@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
     // query
 
     socket.join("result-admin")
-    io.in("result-admin").emit("bebas", /* Value */ );
+    io.in("result-admin").emit("data-admin", /* Value */ );
   })
 
   socket.on("result-juri", () => {
@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
     // query
 
     socket.join("result-juri")
-    io.in("result-juri").emit("bebas", /* Value */ );
+    io.in("result-juri").emit("data-juri", /* Value */ );
   })
 
 
