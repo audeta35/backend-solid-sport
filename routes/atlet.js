@@ -6,4 +6,6 @@ routes.get("/", atletController.getAtlet);
 routes.post("/add", atletController.addAtlet);
 routes.post("/add-hth", atletController.addAtletHth);
 
+routes.post('/import-group', atletController.importGrouping);
+
 module.exports = routes;
