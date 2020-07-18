@@ -31,7 +31,7 @@ exports.doPointsByUser = (req, res) => {
             return response.invalid(res, 'Points');
         }
         // check if jury have done gave a point to user or not
-        let qValidateJury = `SELECT id_result FROM result WHERE id_user=? AND id_match=?`;
+        let qValidateJury = `SELECT * FROM result WHERE id_atlet=? AND id_match=? ORDER BY id_user ASC`;
         conn.query(qValidateJury, [ userId, matchId ],(err, juryList) => {
             if(err) {
                 return res.status(422).send(err);
@@ -139,7 +139,8 @@ exports.doPointsByUser = (req, res) => {
                             } else if(athleteList.length > 7) {
                                 return response.invalid(res, 'Points');
                             } else {
-                                return response.success(res, result)
+                                console.log('====', ath)
+                                return response.success(res, athleteList)
                             }
                         })
                     }
@@ -177,13 +178,15 @@ exports.getPointForScoreboard = (req, res) => {
     } else if(!matchId) {
         return response.falseRequirement(res, 'Id pertandingan');
     } else {
-        let qValidateResult = `SELECT * FROM result WHERE id_atlet=? AND id_match=?`;
+        console.log('===', athleteId, matchId)
+        let qValidateResult = `SELECT * FROM result WHERE id_atlet=? AND id_match=? ORDER BY id_user ASC`;
         conn.query(qValidateResult, [ athleteId, matchId ], (err, athleteList, field) => {
             if(err) {
                 return res.status(422).send(err);
             }
             // check if all jury have given a score, insert to table points
             if(athleteList.length === 7) {
+                console.log('pertama', athleteList)
                 let originalAthleteList = [...athleteList];
                 let filterTechnicalResult = originalAthleteList.sort((a, b) => a.technical_result < b.technical_result);
                 let filterAthleticResult = athleteList.sort((a, b) => a.athletic_result < b.athletic_result);
@@ -239,7 +242,7 @@ exports.getPointForScoreboard = (req, res) => {
                             let qShowFinalResult = `SELECT * 
                                                     FROM points AS p
                                                     LEFT JOIN athlete AS a ON a.id_atlet = p.id_atlet 
-                                                    WHERE id_point=?`;
+                                                    WHERE id_point=? `;
                             conn.query(qShowFinalResult, [ resultPoints.insertId ],
                             (err, pointList) => {
                                 if(err) {
@@ -251,7 +254,9 @@ exports.getPointForScoreboard = (req, res) => {
                                         message: 'Invalid id points'
                                     })
                                 }
-                                console.log(finalAthleticResult)
+                                
+                                athleteList =  athleteList.sort((a, b) => a.id_user > b.id_user);
+                                console.log('====booo', athleteList)
                                 const result = {
                                     athlete_point_list: athleteList,
                                     technical_point: finalTechnicalResult.toFixed(2),
