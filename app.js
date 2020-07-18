@@ -54,30 +54,34 @@ io.on("connection", (socket) => {
   });
 
   socket.on("scoreboard", () => {
-    let query = "SELECT * FROM athlete WHERE status=1";
-    conn.query(query, [], (err, atlet, field) => {
-      if(!err) {
-        socket.join("scoreboard");
-        io.in("scoreboard").emit("data-score", atlet);
-      }
-    })
+    socket.join("realtime");
+    io.in("realtime").emit("data-score");
   })
+
+  socket.on("reset-scoreboard", () => {
+    socket.join("realtime");
+    io.in("realtime").emit("reset-data-score");
+  });
 
   socket.on("result-admin", () => {
-
-    // query
-
-    socket.join("result-admin")
-    io.in("result-admin").emit("data-admin", /* Value */ );
+    socket.join("realtime")
+    io.in("realtime").emit("data-admin");
   })
+
+  socket.on("reset-admin", () => {
+    socket.join("realtime");
+    io.in("realtime").emit("reset-data-admin");
+  });
 
   socket.on("result-juri", () => {
-
-    // query
-
-    socket.join("result-juri")
-    io.in("result-juri").emit("data-juri", /* Value */ );
+    socket.join("realtime")
+    io.in("realtime").emit("data-juri");
   })
+
+  socket.on("reset-juri", () => {
+    socket.join("realtime");
+    io.in("realtime").emit("reset-data-juri");
+  });
 
 
   socket.on("disconnect", function () {
