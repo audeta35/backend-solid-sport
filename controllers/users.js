@@ -79,9 +79,7 @@ exports.loginUsers = (req, res) => {
             let updateStatus = `UPDATE users SET status=?, token=? WHERE id_user=?`;
             let status = "online";
             let id_user = users[0].id_user;
-            const token = jwt.sign({ users }, process.env.JWT_KEY, {
-              expiresIn: "12h",
-            });
+            const token = "null";
             conn.query(updateStatus, [status, token, id_user],(err, result, field) => {
               if(err) {
                 return res.status(422).send(err);
@@ -116,9 +114,10 @@ exports.loginAdmin = (req, res) => {
         let updateStatus = `UPDATE users SET status=?, token=? WHERE id_user=?`;
         let status = "online";
         let id_user = users[0].id_user;
-        const token = jwt.sign({ users }, process.env.JWT_KEY, {
-          expiresIn: "12h",
-        });
+        const token = "null"
+        // jwt.sign({ users }, process.env.JWT_KEY, {
+        //   expiresIn: "12h",
+        // });
         conn.query(
           updateStatus,
           [status, token, id_user],
