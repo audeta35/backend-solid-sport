@@ -17,16 +17,16 @@ exports.getAllMatch = (req, res) => {
 }
 
 exports.updateMatch = (req, res) => {
-  let {id} = req.body;
+  let { id } = req.body;
   let status = 2;
-  let query = "UPDATE athlete SET status=? WHERE id_atlet=?";
+  let query = "UPDATE `athlete` SET status=? WHERE id_atlet=?";
   let query2 = "UPDATE `match` SET status=? WHERE id_atlet=?";
   
   conn.query(query, [status, id], (err, result, field) => {
     if(!err) {
       conn.query(query2, [status, id], (err, result2, field) => {
         if(!err) {
-          response.success(res, result);
+          response.success(res, result2);
         } else {
           res.status(422).send(err);
         }
