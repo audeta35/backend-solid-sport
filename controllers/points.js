@@ -31,7 +31,7 @@ exports.doPointsByUser = (req, res) => {
             return response.invalid(res, 'Points');
         }
         // check if jury have done gave a point to user or not
-        let qValidateJury = `SELECT * FROM result WHERE id_atlet=? AND id_match=? ORDER BY id_user ASC`;
+        let qValidateJury = `SELECT * FROM result WHERE id_user=? AND id_match=? ORDER BY id_user ASC`;
         conn.query(qValidateJury, [ userId, matchId ],(err, juryList) => {
             if(err) {
                 return res.status(422).send(err);
@@ -139,7 +139,6 @@ exports.doPointsByUser = (req, res) => {
                             } else if(athleteList.length > 7) {
                                 return response.invalid(res, 'Points');
                             } else {
-                                console.log('====', ath)
                                 return response.success(res, athleteList)
                             }
                         })
