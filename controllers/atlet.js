@@ -198,10 +198,17 @@ exports.importGrouping = (req, res) => {
 exports.deteleAtlet = (req, res) => {
     let { id } = req.params;
     let query = "DELETE FROM athlete WHERE id_atlet=?";
+    let query2 = "DELETE FROM `match` WHERE id_atlet=?";
 
     conn.query(query, [id], (err, result, field) => {
         if(!err) {
-            response.success(res, result);
+            conn.query(query2, [id], (err2, result2, field2) => {
+                if (!err2) {
+                  response.success(res, result2);
+                } else {
+                  res.status(422).send(err2);
+                }
+            })
         } else {
             res.status(422).send(err);
         }
@@ -212,12 +219,19 @@ exports.deteleGroup = (req, res) => {
   let { id } = req.params;
   let query = "DELETE FROM `groups` WHERE id=?";
   let query2 = "DELETE FROM athlete";
+  let query3 = "DELETE FROM `match`";
 
   conn.query(query, [id], (err, result, field) => {
     if (!err) {
       conn.query(query2, [], (err2, result2, field2) => {
           if (!err2) {
-            response.success(res, result2);
+            conn.query(query3, [], (err3, result3, field3) => {
+                if (!err3) {
+                  response.success(res, result3);
+                } else {
+                  res.status(422).send(err3);
+                }
+            })
           } else {
             res.status(422).send(err2);
           }
