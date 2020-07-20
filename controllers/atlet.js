@@ -85,8 +85,8 @@ exports.addAtlet = (req, res) => {
 
     conn.query(addAtlet, [value], (err, result1, field) => {
         if(!err) {
-            conn.query(getGroup, [], (err, result2, field) => {
-            if (!err) {
+            conn.query(getGroup, [], (err2, result2, field) => {
+            if (!err2) {
                 kiys.map((kuy) => {
                     if (!result2[kuy]) {
                         value2.push([group[kuy].name]);
@@ -94,11 +94,11 @@ exports.addAtlet = (req, res) => {
                 });
 
                 if(value2.length) {
-                    conn.query(addGroup, [value2], (err, result3, field) => {
-                        if(!err) {
+                    conn.query(addGroup, [value2], (err3, result3, field) => {
+                        if(!err3) {
                             response.success(res, result3);
                         } else {
-                            res.status(422).send(err);   
+                            res.status(422).send(err3);   
                         }
                     })
                 } else {
@@ -106,7 +106,7 @@ exports.addAtlet = (req, res) => {
                 }
 
             } else {
-                res.status(422).send(err);
+                res.status(422).send(err2);
             }
             }); 
         } else {
@@ -194,3 +194,36 @@ exports.importGrouping = (req, res) => {
         }
     })
 }
+
+exports.deteleAtlet = (req, res) => {
+    let { id } = req.params;
+    let query = "DELETE FROM athlete WHERE id_atlet=?";
+
+    conn.query(query, [id], (err, result, field) => {
+        if(!err) {
+            response.success(res, result);
+        } else {
+            res.status(422).send(err);
+        }
+    })
+}
+
+exports.deteleGroup = (req, res) => {
+  let { id } = req.params;
+  let query = "DELETE FROM `groups` WHERE id=?";
+  let query2 = "DELETE FROM athlete";
+
+  conn.query(query, [id], (err, result, field) => {
+    if (!err) {
+      conn.query(query2, [], (err2, result2, field2) => {
+          if (!err2) {
+            response.success(res, result2);
+          } else {
+            res.status(422).send(err2);
+          }
+      })
+    } else {
+      res.status(422).send(err);
+    }
+  });
+};
