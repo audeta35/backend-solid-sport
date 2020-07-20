@@ -12,6 +12,7 @@ const userRoutes = require('./routes/users');
 const atletRoutes = require('./routes/atlet');
 const matchRoutes = require("./routes/match");
 const pointsRoutes = require('./routes/points');
+const tatamiRoutes = require("./routes/tatami");
 
 server.use(function (req, res, next) {
   req.io = io;
@@ -106,6 +107,7 @@ server.use('/users', userRoutes);
 server.use('/atlet', atletRoutes);
 server.use('/match', matchRoutes);
 server.use('/points', pointsRoutes);
+server.use("/tatami", tatamiRoutes);
 
 app.listen(port);
 console.log(`Server listening on port ${port}`);
