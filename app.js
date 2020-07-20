@@ -24,16 +24,17 @@ server.use(bodyParser.json());
 
 let whiteList = ["http://localhost:4200", "http://localhost:3000"];
 server.use(
-  cors({
-    // origin: (origin, cb) => {
-    //   if (whiteList.indexOf(origin) !== -1) {
-    //     cb(null, true);
-    //   } else {
-    //     cb(new Error("Not allowed by CORS"));
-    //   }
-    // },
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  })
+  // cors({
+  //   // origin: (origin, cb) => {
+  //   //   if (whiteList.indexOf(origin) !== -1) {
+  //   //     cb(null, true);
+  //   //   } else {
+  //   //     cb(new Error("Not allowed by CORS"));
+  //   //   }
+  //   // },
+  //   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  // })
+  cors()
 );
 
 const users = {}
