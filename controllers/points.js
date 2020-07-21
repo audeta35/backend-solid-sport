@@ -99,39 +99,49 @@ exports.doPointsByUser = (req, res) => {
                                         finalResult = (finalTechnicalResult + finalAthleticResult).toFixed(2);
                                         
                                         // insert to table points
-                                        let qInsertPoints = `INSERT INTO points SET id_match=?, total_point=?, id_atlet=?`;
-                                        conn.query(qInsertPoints, [ matchId, finalResult, athleteId],
-                                        (err, resultPoints) => {
+                                        let qValidateInsertPoints = `SELECT *FROM points WHERE id_match=? AND id_atlet=?`;
+                                        conn.query(qValidateInsertPoints, [ matchId, athleteId ],
+                                        (err, pointValidateList) => {
                                             if(err) {
                                                 return res.status(422).send(err);
                                             }
-                                            console.log(resultPoints)
-                                            let qShowFinalResult = `SELECT * 
-                                                                    FROM points AS p
-                                                                    LEFT JOIN athlete AS a ON a.id_atlet = p.id_atlet 
-                                                                    WHERE id_point=?`;
-                                            conn.query(qShowFinalResult, [ resultPoints.insertId ],
-                                            (err, pointList) => {
+                                            if(pointValidateList.length > 0) {
+                                                return response.success(res, 'This match has been assessment.')
+                                            }
+                                            let qInsertPoints = `INSERT INTO points SET id_match=?, total_point=?, id_atlet=?`;
+                                            conn.query(qInsertPoints, [ matchId, finalResult, athleteId],
+                                            (err, resultPoints) => {
                                                 if(err) {
                                                     return res.status(422).send(err);
                                                 }
-                                                if(pointList.length < 1) {
-                                                    return res.status(404).send({
-                                                        status: 404,
-                                                        message: 'Invalid id points'
-                                                    })
-                                                }
-                                                console.log(pointList)
-                                                const boo = {
-                                                    athlete_point_list: athleteList,
-                                                    technical_point_result: technicalPoint,
-                                                    athletic_point_result: athleticPoint,
-                                                    total_point: pointList[0].total_point,
-                                                    athlete_profile: pointList,
-                                                    technical_point: finalTechnicalResult.toFixed(2),
-                                                    athletic_point: finalAthleticResult.toFixed(2),
-                                                }
-                                                return response.success(res, boo)
+                                                console.log(resultPoints)
+                                                let qShowFinalResult = `SELECT * 
+                                                                        FROM points AS p
+                                                                        LEFT JOIN athlete AS a ON a.id_atlet = p.id_atlet 
+                                                                        WHERE id_point=?`;
+                                                conn.query(qShowFinalResult, [ resultPoints.insertId ],
+                                                (err, pointList) => {
+                                                    if(err) {
+                                                        return res.status(422).send(err);
+                                                    }
+                                                    if(pointList.length < 1) {
+                                                        return res.status(404).send({
+                                                            status: 404,
+                                                            message: 'Invalid id points'
+                                                        })
+                                                    }
+                                                    console.log(pointList)
+                                                    const boo = {
+                                                        athlete_point_list: athleteList,
+                                                        technical_point_result: technicalPoint,
+                                                        athletic_point_result: athleticPoint,
+                                                        total_point: pointList[0].total_point,
+                                                        athlete_profile: pointList,
+                                                        technical_point: finalTechnicalResult.toFixed(2),
+                                                        athletic_point: finalAthleticResult.toFixed(2),
+                                                    }
+                                                    return response.success(res, boo)
+                                                })
                                             })
                                         })
                                     }
