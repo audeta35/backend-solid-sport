@@ -75,7 +75,7 @@ exports.addAtlet = (req, res) => {
       value.push([
         payload[key].name,
         payload[key].kontingen,
-        "none",
+        payload[key].class,
         payload[key].kata,
         payload[key].group,
         payload[key].attribute,
