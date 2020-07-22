@@ -188,7 +188,6 @@ exports.getPointForScoreboard = (req, res) => {
     } else if(!matchId) {
         return response.falseRequirement(res, 'Id pertandingan');
     } else {
-        console.log('===', athleteId, matchId)
         let qValidateResult = `SELECT * FROM result WHERE id_atlet=? AND id_match=? ORDER BY id_user ASC`;
         conn.query(qValidateResult, [ athleteId, matchId ], (err, athleteList, field) => {
             if(err) {
@@ -247,7 +246,7 @@ exports.getPointForScoreboard = (req, res) => {
                         (err, pointValidateList) => {
                             if(err) {
                                 return res.status(422).send(err);
-                            }
+                            }                         
                             if(pointValidateList.length > 0) {
                                 let qShowFinalResult = `SELECT * 
                                                         FROM points AS p
@@ -294,7 +293,6 @@ exports.getPointForScoreboard = (req, res) => {
                                         }
                                         
                                         athleteList =  athleteList.sort((a, b) => a.id_user > b.id_user);
-                                        console.log('====booo', athleteList)
                                         const result = {
                                             athlete_point_list: athleteList,
                                             technical_point: finalTechnicalResult.toFixed(2),
@@ -318,4 +316,29 @@ exports.getPointForScoreboard = (req, res) => {
             }
         })
     }
+}
+
+exports.changeAthleteAssessment = (req, res) => {
+    let { athleteId } = req.params;
+    // update atlet status to have done matching
+    let qUpdateAthleteStatus = `UPDATE athlete SET status=? WHERE id_atlet=?`;
+    conn.query(qUpdateAthleteStatus, [ 2, athleteId ], (err, result) => {
+        if(err) {
+            return res.status(422).send(err);
+        }
+        if(result.affectedRows !== 1) {
+            return response.invalid(res, 'Id atlet')
+        }
+        // after that, change athlete now to the next athlete
+        let qSelectNext = "SELECT * FROM `match` LEFT JOIN athlete as a ON a.id_atlet = match.id_atlet WHERE match.status =? AND a.status=?";
+        conn.query(qSelectNext, [1, 1], (err, matchList) => {
+            if(err) {
+                return res.status(422).send(err);
+            }
+            if(matchList.length < 1) {
+                return response.notFound(res);
+            }
+            return response.success(res, matchList);
+        })
+    })
 }

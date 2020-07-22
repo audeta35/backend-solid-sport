@@ -142,7 +142,7 @@ exports.getAtlet = (req, res) => {
 
 exports.getAtletByMatch = (req, res) => {
 
-    let query = "SELECT * FROM `match` LEFT JOIN athlete as a ON a.id_atlet = match.id_atlet WHERE match.status = 1";
+    let query = "SELECT * FROM `match` LEFT JOIN athlete as a ON a.id_atlet = match.id_atlet WHERE match.status = 1 AND a.status=1";
     conn.query(query, (err, matchList) => {
         if(err) {
             return res.status(422).send(err);
