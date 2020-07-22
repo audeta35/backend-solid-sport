@@ -40,20 +40,27 @@ server.use(
 const users = {}
 io.on("connection", (socket) => {
   console.log("welcome user");
-  
-  socket.on("login", function (user) {
-    console.log(`${user.username} logged in as ${user.name}`);
-    // saving userId to array with socket ID
-    users[socket.id] = user.id_user;
 
+  if (users[socket.id]) {
     let status = "online";
     let updateStatus = `UPDATE users SET status=? WHERE id_user=?`;
-    conn.query(updateStatus, [status, user.id_user], (err, result, field) => {
-      socket.join('getStatus');
-      io.in('getStatus').emit('getStatus');
-    })
+    conn.query(updateStatus, [status, users[socket.id]], (err, result, field) => {
+      io.in("getStatus").emit("getStatus");
+    });
+  }
 
-  });
+    socket.on("login", function (user) {
+      console.log(`${user.username} logged in as ${user.name}`);
+      // saving userId to array with socket ID
+      users[socket.id] = user.id_user;
+
+      let status = "online";
+      let updateStatus = `UPDATE users SET status=? WHERE id_user=?`;
+      conn.query(updateStatus, [status, user.id_user], (err, result, field) => {
+        socket.join("getStatus");
+        io.in("getStatus").emit("getStatus");
+      });
+    });
 
   socket.on("scoreboard", () => {
     socket.join("realtime");
