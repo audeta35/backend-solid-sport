@@ -106,6 +106,7 @@ exports.doPointsByUser = (req, res) => {
                                                 return res.status(422).send(err);
                                             }
                                             if(pointValidateList.length > 0) {
+                                                
                                                 return response.success(res, 'This match has been assessment.')
                                             }
                                             let qInsertPoints = `INSERT INTO points SET id_match=?, total_point=?, id_atlet=?`;
@@ -248,45 +249,65 @@ exports.getPointForScoreboard = (req, res) => {
                                 return res.status(422).send(err);
                             }
                             if(pointValidateList.length > 0) {
-                                return response.success(res, 'This match has been assessment.')
-                            }
-                            let qInsertPoints = `INSERT INTO points SET id_match=?, total_point=?, id_atlet=?`;
-                            conn.query(qInsertPoints, [ matchId, finalResult, athleteId],
-                            (err, resultPoints) => {
-                                if(err) {
-                                    return res.status(422).send(err);
-                                }
-                                console.log(resultPoints)
                                 let qShowFinalResult = `SELECT * 
                                                         FROM points AS p
                                                         LEFT JOIN athlete AS a ON a.id_atlet = p.id_atlet 
-                                                        WHERE id_point=? `;
-                                conn.query(qShowFinalResult, [ resultPoints.insertId ],
+                                                        WHERE id_point=?`;
+                                conn.query(qShowFinalResult, [ pointValidateList[0].id_point ],
                                 (err, pointList) => {
                                     if(err) {
                                         return res.status(422).send(err);
                                     }
-                                    if(pointList.length < 1) {
-                                        return res.status(404).send({
-                                            status: 404,
-                                            message: 'Invalid id points'
-                                        })
-                                    }
-                                    
-                                    athleteList =  athleteList.sort((a, b) => a.id_user > b.id_user);
-                                    console.log('====booo', athleteList)
-                                    const result = {
+                                    let finalResult = {
                                         athlete_point_list: athleteList,
+                                        technical_point_result: technicalPoint,
+                                        athletic_point_result: athleticPoint,
+                                        total_point: pointList[0].total_point,
+                                        athlete_profile: pointList,
                                         technical_point: finalTechnicalResult.toFixed(2),
                                         athletic_point: finalAthleticResult.toFixed(2),
-                                        technical_point_result: technicalPoint.toFixed(2),
-                                        athletic_point_result: athleticPoint.toFixed(2),
-                                        total_point: pointList[0].total_point,
-                                        athlete_profile: pointList
                                     }
-                                    return response.success(res, result)
+                                    return response.success(res, finalResult)
                                 })
-                            })
+                            } else {
+                                let qInsertPoints = `INSERT INTO points SET id_match=?, total_point=?, id_atlet=?`;
+                                conn.query(qInsertPoints, [ matchId, finalResult, athleteId],
+                                (err, resultPoints) => {
+                                    if(err) {
+                                        return res.status(422).send(err);
+                                    }
+                                    console.log(resultPoints)
+                                    let qShowFinalResult = `SELECT * 
+                                                            FROM points AS p
+                                                            LEFT JOIN athlete AS a ON a.id_atlet = p.id_atlet 
+                                                            WHERE id_point=? `;
+                                    conn.query(qShowFinalResult, [ resultPoints.insertId ],
+                                    (err, pointList) => {
+                                        if(err) {
+                                            return res.status(422).send(err);
+                                        }
+                                        if(pointList.length < 1) {
+                                            return res.status(404).send({
+                                                status: 404,
+                                                message: 'Invalid id points'
+                                            })
+                                        }
+                                        
+                                        athleteList =  athleteList.sort((a, b) => a.id_user > b.id_user);
+                                        console.log('====booo', athleteList)
+                                        const result = {
+                                            athlete_point_list: athleteList,
+                                            technical_point: finalTechnicalResult.toFixed(2),
+                                            athletic_point: finalAthleticResult.toFixed(2),
+                                            technical_point_result: technicalPoint.toFixed(2),
+                                            athletic_point_result: athleticPoint.toFixed(2),
+                                            total_point: pointList[0].total_point,
+                                            athlete_profile: pointList
+                                        }
+                                        response.success(res, result)
+                                    })
+                                })
+                            }
                         })
                     }
                 }
