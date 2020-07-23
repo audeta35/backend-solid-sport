@@ -134,8 +134,8 @@ exports.doPointsByUser = (req, res) => {
                                                     console.log(pointList)
                                                     const boo = {
                                                         athlete_point_list: athleteList,
-                                                        technical_point_result: technicalPoint,
-                                                        athletic_point_result: athleticPoint,
+                                                        technical_point_result: technicalPoint.toFixed(2),
+                                                        athletic_point_result: athleticPoint.toFixed(2),
                                                         total_point: pointList[0].total_point,
                                                         athlete_profile: pointList,
                                                         technical_point: finalTechnicalResult.toFixed(2),
@@ -258,8 +258,8 @@ exports.getPointForScoreboard = (req, res) => {
                                     }
                                     let finalResult = {
                                         athlete_point_list: athleteList,
-                                        technical_point_result: technicalPoint,
-                                        athletic_point_result: athleticPoint,
+                                        technical_point_result: technicalPoint.toFixed(2),
+                                        athletic_point_result: athleticPoint.toFixed(2),
                                         total_point: pointList[0].total_point,
                                         athlete_profile: pointList,
                                         technical_point: finalTechnicalResult.toFixed(2),
