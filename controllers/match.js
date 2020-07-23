@@ -70,3 +70,14 @@ exports.addMatchGroup = (req, res) => {
     });
     
 }
+
+exports.recapMatch = (req, res) => {
+  let query = "SELECT * FROM points JOIN athlete ON points.id_atlet = athlete.id_atlet";
+  conn.query(query, [], (err, result, field) => {
+    if(!err) {
+      response.success(res, result);
+    } else {
+      res.status(422).send(err);
+    }
+  })
+}
