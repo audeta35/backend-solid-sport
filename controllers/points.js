@@ -195,7 +195,6 @@ exports.getPointForScoreboard = (req, res) => {
             }
             // check if all jury have given a score, insert to table points
             if(athleteList.length === 7) {
-                console.log('pertama', athleteList)
                 let originalAthleteList = [...athleteList];
                 let filterTechnicalResult = originalAthleteList.sort((a, b) => a.technical_result < b.technical_result);
                 let filterAthleticResult = athleteList.sort((a, b) => a.athletic_result < b.athletic_result);
