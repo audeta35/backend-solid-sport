@@ -7,5 +7,5 @@ routes.post("/get-scoreboard-point/:athleteId/:matchId", pointsController.getPoi
 
 routes.post("/calculate", pointsController.doPointsByUser);
 routes.post("/get-next-athlete/:athleteId", pointsController.changeAthleteAssessment);
-
+routes.post('/calculate-by-admin', pointsController.doPointByAdmin);
 module.exports = routes;

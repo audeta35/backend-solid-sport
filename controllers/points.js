@@ -134,8 +134,8 @@ exports.doPointsByUser = (req, res) => {
                                                     console.log(pointList)
                                                     const boo = {
                                                         athlete_point_list: athleteList,
-                                                        technical_point_result: technicalPoint.toFixed(2),
-                                                        athletic_point_result: athleticPoint.toFixed(2),
+                                                        technical_point_result: technicalPoint,
+                                                        athletic_point_result: athleticPoint,
                                                         total_point: pointList[0].total_point,
                                                         athlete_profile: pointList,
                                                         technical_point: finalTechnicalResult.toFixed(2),
@@ -158,6 +158,71 @@ exports.doPointsByUser = (req, res) => {
             }
         })
     })
+}
+exports.doPointByAdmin = (req, res) => {
+    let { matchId, athleteId, adminPointList } = req.body;
+    // console.log(req.body)
+    if(!matchId) {
+        return response.falseRequirement(res, 'Id pertandingan');
+    } else if(adminPointList.length < 7) {
+        return response.falseRequirement(res, 'Admin point list');
+    } else if(!athleteId) {
+        return response.falseRequirement(res, 'Id atlet');
+    } else {
+        // validate if jury already assessment
+        let qValidateJury = `SELECT * FROM result WHERE id_user=? AND id_match=?`;
+
+        let qInsertPoints = `INSERT INTO result 
+                             SET id_match=?, id_user=?, id_atlet=?, technical_result=?, athletic_result=?
+                            `;
+        for(let i in adminPointList){
+            const { userId, techValue, athValue } = adminPointList[i];
+            if(!userId)  {
+                response.falseRequirement(res, `Id juri ke-${ parseInt(i) + 1 }`);
+                break;
+            } else if(!techValue) {
+                techValue = 0;
+            } else if(!athValue) {
+                athValue = 0;
+            } else {
+                if(parseInt(i) === adminPointList.length - 1) {                    
+                    let counter = 0;
+                    for(let j in adminPointList) {
+                        const { userId, techValue, athValue } = adminPointList[j];
+                        // validate jury assessment
+                        conn.query(qValidateJury, [ userId, matchId], (err, juryList) => {
+                            if(err) {
+                                return res.status(422).send(err);
+                            }
+                            if(juryList.length > 0) {
+                                if((parseInt(j) === adminPointList.length - 1) && counter === 0) {
+                                    return response.invalid(res, 'assessment, cause all jury has been assessment')
+                                } else if((parseInt(j) === adminPointList.length - 1) && counter > 0) {
+                                    return res.status(200).send({
+                                        message: 'OK',
+                                        status: 200
+                                    })
+                                } 
+                            } else {
+                                counter ++;
+                                conn.query(qInsertPoints, [ matchId, userId, athleteId, techValue, athValue ], (err, result) => {
+                                    if(err) {
+                                        return res.status(422).send(err);
+                                    }
+                                    if(parseInt(j) === adminPointList.length - 1) {
+                                        return res.status(200).send({
+                                            message: 'OK',
+                                            status: 200
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }
 }
 
 exports.getPointForAdmin = (req, res) => {
@@ -195,6 +260,7 @@ exports.getPointForScoreboard = (req, res) => {
             }
             // check if all jury have given a score, insert to table points
             if(athleteList.length === 7) {
+                console.log('pertama', athleteList)
                 let originalAthleteList = [...athleteList];
                 let filterTechnicalResult = originalAthleteList.sort((a, b) => a.technical_result < b.technical_result);
                 let filterAthleticResult = athleteList.sort((a, b) => a.athletic_result < b.athletic_result);
