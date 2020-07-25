@@ -3,6 +3,8 @@ const routes = express.Router();
 const atletController = require("../controllers/atlet");
 
 routes.get("/", atletController.getAtlet);
+routes.get("/get-group", atletController.getGroup);
+routes.get("/get-ranking/:id", atletController.getAtletRank);
 routes.post("/get-by-match", atletController.getAtletByMatch);
 routes.post("/add", atletController.addAtlet);
 routes.post("/add-hth", atletController.addAtletHth);
