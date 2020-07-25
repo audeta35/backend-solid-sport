@@ -43,16 +43,29 @@ exports.getGroup = (req, res) => {
 
 exports.getAtletRank = (req, res) => {
     let { id } = req.params;
-    let query =
-      "SELECT * FROM points JOIN athlete ON points.id_atlet = athlete.id_atlet JOIN groups ON athlete.grouping = groups.group_name WHERE groups.id = ? ORDER BY points.total_point DESC LIMIT 4";
+    if(id !== 'individual') {
+        let query =
+        "SELECT * FROM points JOIN athlete ON points.id_atlet = athlete.id_atlet JOIN groups ON athlete.grouping = groups.group_name WHERE groups.id = ? ORDER BY points.total_point DESC LIMIT 4";
 
-    conn.query(query, [id], (err, result, field) => {
+        conn.query(query, [id], (err, result, field) => {
         if (!err) {
-          response.success(res, result);
+            response.success(res, result);
         } else {
-          res.status(422).send(err);
+            res.status(422).send(err);
         }
-    })
+        });
+    } else {
+        let query =
+          "SELECT * FROM points JOIN athlete ON points.id_atlet = athlete.id_atlet WHERE athlete.grouping = 'null' ORDER BY points.total_point DESC LIMIT 4";
+
+        conn.query(query, [id], (err, result, field) => {
+          if (!err) {
+            response.success(res, result);
+          } else {
+            res.status(422).send(err);
+          }
+        });
+    }
 }
 
 exports.addAtletHth = (req, res) => {
