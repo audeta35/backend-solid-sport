@@ -30,6 +30,31 @@ fileFilter: function (req, file, callback) {
 }
 }).single('file');
 
+exports.getGroup = (req, res) => {
+    let query = "SELECT * FROM groups";
+    conn.query(query, [], (err, result, field) => {
+        if(!err) {
+            response.success(res, result);
+        } else {
+            res.status(422).send(err);
+        }
+    })
+}
+
+exports.getAtletRank = (req, res) => {
+    let { id } = req.params;
+    let query =
+      "SELECT * FROM points JOIN athlete ON points.id_atlet = athlete.id_atlet JOIN groups ON athlete.grouping = groups.group_name WHERE groups.id = ? ORDER BY points.total_point DESC LIMIT 4";
+
+    conn.query(query, [id], (err, result, field) => {
+        if (!err) {
+          response.success(res, result);
+        } else {
+          res.status(422).send(err);
+        }
+    })
+}
+
 exports.addAtletHth = (req, res) => {
     let {payload} = req.body;
     let keys = Object.keys(payload);
