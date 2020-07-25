@@ -92,6 +92,15 @@ io.on("connection", (socket) => {
     io.in("realtime").emit("reset-data-juri");
   });
 
+  // remote control scoreboard
+
+  socket.on("push-link-listscore", (item) => {
+    io.sockets.emit("listscore-link", item);
+  })
+
+  socket.on("push-link-scoreboard", () => {
+    io.sockets.emit("scoreboard-link");
+  });
 
   socket.on("disconnect", function () {
     console.log("user with id: " + users[socket.id] + " disconnected");
