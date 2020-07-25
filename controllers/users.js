@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 exports.getAllUsers = (req, res) => {
     let level = 0;
-    let getUser = `SELECT * FROM users WHERE level=?`;
+    let getUser = `SELECT * FROM users WHERE users.level = ? ORDER BY users.name ASC LIMIT 7`;
     conn.query(getUser, [level], (err, users, field) => {
         if(!err) {
             response.success(res, users);
