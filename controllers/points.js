@@ -178,6 +178,7 @@ exports.doPointByAdmin = (req, res) => {
         for(let i in adminPointList){
             const { userId, techValue, athValue } = adminPointList[i];
             if(!userId)  {
+                console.log('= masuk yeah')
                 response.falseRequirement(res, `Id juri ke-${ parseInt(i) + 1 }`);
                 break;
             } else if(!techValue) {
@@ -191,10 +192,12 @@ exports.doPointByAdmin = (req, res) => {
                         const { userId, techValue, athValue } = adminPointList[j];
                         // validate jury assessment
                         conn.query(qValidateJury, [ userId, matchId], (err, juryList) => {
+                            console.log(j, counter)
                             if(err) {
                                 return res.status(422).send(err);
                             }
                             if(juryList.length > 0) {
+                                console.log(`===============Juri ${ parseInt(j) + 1} sudah menilai `, counter);
                                 if((parseInt(j) === adminPointList.length - 1) && counter === 0) {
                                     return response.invalid(res, 'assessment, cause all jury has been assessment')
                                 } else if((parseInt(j) === adminPointList.length - 1) && counter > 0) {
@@ -203,13 +206,17 @@ exports.doPointByAdmin = (req, res) => {
                                         status: 200
                                     })
                                 } 
+                                console.log(`Jury ${ parseInt(j) + 1 } has been assessment before`);
                             } else {
+                                console.log(`Juri ${ parseInt(j) + 1} belum menilai=============== `, counter);
                                 counter ++;
                                 conn.query(qInsertPoints, [ matchId, userId, athleteId, techValue, athValue ], (err, result) => {
                                     if(err) {
                                         return res.status(422).send(err);
                                     }
+                                    console.log('berhasil insert', counter)
                                     if(parseInt(j) === adminPointList.length - 1) {
+                                        console.log('masuk ke pojok')
                                         return res.status(200).send({
                                             message: 'OK',
                                             status: 200
