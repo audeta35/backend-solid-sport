@@ -70,13 +70,25 @@ exports.doPointsByUser = (req, res) => {
                                     }
                                 }
                                 // compare value from database with comparison
-                                for(let i in athleteList) {
-                                    for (let j in threeOnTop) {
-                                        if(athleteList[i].technical_result === threeOnTop[j].technical_result) {
-                                            athleteList[i].technical_result_status = 1;
-                                        }
-                                        if(athleteList[i].athletic_result === threeOnTop[j].athletic_result) {
-                                            athleteList[i].athletic_result_status = 1;
+                                let counterTech = 0;
+                                let counterAth = 0;
+                                for(let i in threeOnTop) {
+                                    if(counterTech >= 3 && counterAth >= 3) {
+                                        break;
+                                    } else {
+                                        for (let j in athleteList) {
+                                            if((counterTech >= 3) && counterAth >= 3) {
+                                                break;
+                                            } else {
+                                                if(threeOnTop[i].technical_result === athleteList[j].technical_result && counterTech <= 3) {
+                                                    athleteList[j].technical_result_status = 1;
+                                                    counterTech++;
+                                                }
+                                                if(threeOnTop[i].athletic_result === athleteList[j].athletic_result && counterAth <= 3) {
+                                                    athleteList[j].athletic_result_status = 1;
+                                                    counterAth++;
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -284,17 +296,30 @@ exports.getPointForScoreboard = (req, res) => {
                     }
                 }
                 // compare value from database with comparison
-                for(let i in athleteList) {
-                    for (let j in threeOnTop) {
-                        if(athleteList[i].technical_result === threeOnTop[j].technical_result) {
-                            athleteList[i].technical_result_status = 1;
-                        }
-                        if(athleteList[i].athletic_result === threeOnTop[j].athletic_result) {
-                            athleteList[i].athletic_result_status = 1;
+                let counterTech = 0;
+                let counterAth = 0;
+                console.log('============ three on top', threeOnTop);
+                for(let i in threeOnTop) {
+                    if(counterTech >= 3 && counterAth >= 3) {
+                        break;
+                    } else {
+                        for (let j in athleteList) {
+                            if((counterTech >= 3) && counterAth >= 3) {
+                                break;
+                            } else {
+                                if(threeOnTop[i].technical_result === athleteList[j].technical_result && counterTech <= 3) {
+                                    athleteList[j].technical_result_status = 1;
+                                    counterTech++;
+                                }
+                                if(threeOnTop[i].athletic_result === athleteList[j].athletic_result && counterAth <= 3) {
+                                    athleteList[j].athletic_result_status = 1;
+                                    counterAth++;
+                                }
+                            }
                         }
                     }
                 }
-    
+                console.warn('============ counter', counterAth, counterTech)
                 // calculate points for athlete
                 let technicalPoint = 0, 
                     athleticPoint = 0,
