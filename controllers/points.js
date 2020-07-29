@@ -62,7 +62,7 @@ exports.doPointsByUser = (req, res) => {
                                 const threeOnTop = [];
                     
                                 for(let i in filterTechnicalResult) {
-                                    if(i < 3) {
+                                    if(i > 1 && i < 5) {
                                         threeOnTop.push({
                                             technical_result: filterTechnicalResult[i].technical_result,
                                             athletic_result: filterAthleticResult[i].athletic_result
@@ -279,16 +279,16 @@ exports.getPointForScoreboard = (req, res) => {
             }
             // check if all jury have given a score, insert to table points
             if(athleteList.length === 7) {
-                console.log('pertama', athleteList)
                 let originalAthleteList = [...athleteList];
                 let filterTechnicalResult = originalAthleteList.sort((a, b) => a.technical_result < b.technical_result);
                 let filterAthleticResult = athleteList.sort((a, b) => a.athletic_result < b.athletic_result);
-    
+                
+                console.log('pertama', filterTechnicalResult,'\nkedua', filterAthleticResult)
                 // insert value three on top to new array
                 const threeOnTop = [];
     
                 for(let i in filterTechnicalResult) {
-                    if(i < 3) {
+                    if(i > 1 && i < 5) {
                         threeOnTop.push({
                             technical_result: filterTechnicalResult[i].technical_result,
                             athletic_result: filterAthleticResult[i].athletic_result
@@ -319,7 +319,6 @@ exports.getPointForScoreboard = (req, res) => {
                         }
                     }
                 }
-                console.warn('============ counter', counterAth, counterTech)
                 // calculate points for athlete
                 let technicalPoint = 0, 
                     athleticPoint = 0,
@@ -354,6 +353,7 @@ exports.getPointForScoreboard = (req, res) => {
                                     if(err) {
                                         return res.status(422).send(err);
                                     }
+                                    console.table(athleteList)
                                     let finalResult = {
                                         athlete_point_list: athleteList,
                                         technical_point_result: technicalPoint.toFixed(2),
