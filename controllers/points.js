@@ -27,7 +27,7 @@ exports.doPointsByUser = (req, res) => {
         if(err) {
             return res.status(422).send(err);
         }
-        if(userPointList.length >= 7) {
+        if(userPointList.length >= 5) {
             return response.invalid(res, 'Points');
         }
         // check if jury have done gave a point to user or not
@@ -53,7 +53,7 @@ exports.doPointsByUser = (req, res) => {
                                 return res.status(422).send(err);
                             }
                             // check if all jury have given a score, insert to table points
-                            if(athleteList.length === 7) {
+                            if(athleteList.length === 5) {
                                 let originalAthleteList = [...athleteList];
                                 let filterTechnicalResult = originalAthleteList.sort((a, b) => a.technical_result < b.technical_result);
                                 let filterAthleticResult = athleteList.sort((a, b) => a.athletic_result < b.athletic_result);
@@ -62,7 +62,7 @@ exports.doPointsByUser = (req, res) => {
                                 const threeOnTop = [];
                     
                                 for(let i in filterTechnicalResult) {
-                                    if(i > 1 && i < 5) {
+                                    if(i > 0 && i < 4) {
                                         threeOnTop.push({
                                             technical_result: filterTechnicalResult[i].technical_result,
                                             athletic_result: filterAthleticResult[i].athletic_result
@@ -73,20 +73,27 @@ exports.doPointsByUser = (req, res) => {
                                 let counterTech = 0;
                                 let counterAth = 0;
                                 for(let i in threeOnTop) {
+                                    let techStatus = false;
+                                    let athStatus = false;
                                     if(counterTech >= 3 && counterAth >= 3) {
                                         break;
                                     } else {
                                         for (let j in athleteList) {
+                
                                             if((counterTech >= 3) && counterAth >= 3) {
                                                 break;
                                             } else {
-                                                if(threeOnTop[i].technical_result === athleteList[j].technical_result && counterTech <= 3) {
+                                                if(threeOnTop[i].technical_result === athleteList[j].technical_result && counterTech < 3 && !techStatus && !athleteList[j].technical_result_status) {
                                                     athleteList[j].technical_result_status = 1;
+                                                    console.warn('==== a', athleteList[j])
                                                     counterTech++;
+                                                    techStatus = true;
                                                 }
-                                                if(threeOnTop[i].athletic_result === athleteList[j].athletic_result && counterAth <= 3) {
+                                                if(threeOnTop[i].athletic_result === athleteList[j].athletic_result && counterAth < 3 && !athStatus && !athleteList[j].athletic_result_status) {
                                                     athleteList[j].athletic_result_status = 1;
+                                                    console.warn('==== b', athleteList[j])
                                                     counterAth++;
+                                                    athStatus = true;
                                                 }
                                             }
                                         }
@@ -159,7 +166,7 @@ exports.doPointsByUser = (req, res) => {
                                         })
                                     }
                                 }
-                            } else if(athleteList.length > 7) {
+                            } else if(athleteList.length > 5) {
                                 return response.invalid(res, 'Points');
                             } else {
                                 return response.success(res, athleteList)
@@ -176,7 +183,7 @@ exports.doPointByAdmin = (req, res) => {
     // console.log(req.body)
     if(!matchId) {
         return response.falseRequirement(res, 'Id pertandingan');
-    } else if(adminPointList.length < 7) {
+    } else if(adminPointList.length < 5) {
         return response.falseRequirement(res, 'Admin point list');
     } else if(!athleteId) {
         return response.falseRequirement(res, 'Id atlet');
@@ -188,7 +195,7 @@ exports.doPointByAdmin = (req, res) => {
                              SET id_match=?, id_user=?, id_atlet=?, technical_result=?, athletic_result=?
                             `;
         for(let i in adminPointList){
-            const { userId, techValue, athValue } = adminPointList[i];
+            let { userId, techValue, athValue } = adminPointList[i];
             if(!userId)  {
                 console.log('= masuk yeah')
                 response.falseRequirement(res, `Id juri ke-${ parseInt(i) + 1 }`);
@@ -201,7 +208,7 @@ exports.doPointByAdmin = (req, res) => {
                 if(parseInt(i) === adminPointList.length - 1) {                    
                     let counter = 0;
                     for(let j in adminPointList) {
-                        const { userId, techValue, athValue } = adminPointList[j];
+                        let { userId, techValue, athValue } = adminPointList[j];
                         // validate jury assessment
                         conn.query(qValidateJury, [ userId, matchId], (err, juryList) => {
                             console.log(j, counter)
@@ -278,7 +285,7 @@ exports.getPointForScoreboard = (req, res) => {
                 return res.status(422).send(err);
             }
             // check if all jury have given a score, insert to table points
-            if(athleteList.length === 7) {
+            if(athleteList.length === 5) {
                 let originalAthleteList = [...athleteList];
                 let filterTechnicalResult = originalAthleteList.sort((a, b) => a.technical_result < b.technical_result);
                 let filterAthleticResult = athleteList.sort((a, b) => a.athletic_result < b.athletic_result);
@@ -286,9 +293,9 @@ exports.getPointForScoreboard = (req, res) => {
                 console.log('pertama', filterTechnicalResult,'\nkedua', filterAthleticResult)
                 // insert value three on top to new array
                 const threeOnTop = [];
-    
+                console.table(filterTechnicalResult)
                 for(let i in filterTechnicalResult) {
-                    if(i > 1 && i < 5) {
+                    if(parseInt(i) > 0 && parseInt(i) < 4) {
                         threeOnTop.push({
                             technical_result: filterTechnicalResult[i].technical_result,
                             athletic_result: filterAthleticResult[i].athletic_result
@@ -299,26 +306,38 @@ exports.getPointForScoreboard = (req, res) => {
                 let counterTech = 0;
                 let counterAth = 0;
                 console.log('============ three on top', threeOnTop);
+                // var filterDuplicateValue = [];
+                // $.each(names, function(i, el){
+                //     if($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
+                // });
                 for(let i in threeOnTop) {
+                    let techStatus = false;
+                    let athStatus = false;
                     if(counterTech >= 3 && counterAth >= 3) {
                         break;
                     } else {
                         for (let j in athleteList) {
+
                             if((counterTech >= 3) && counterAth >= 3) {
                                 break;
                             } else {
-                                if(threeOnTop[i].technical_result === athleteList[j].technical_result && counterTech <= 3) {
+                                if(threeOnTop[i].technical_result === athleteList[j].technical_result && counterTech < 3 && !techStatus && !athleteList[j].technical_result_status) {
                                     athleteList[j].technical_result_status = 1;
+                                    console.warn('==== a', athleteList[j])
                                     counterTech++;
+                                    techStatus = true;
                                 }
-                                if(threeOnTop[i].athletic_result === athleteList[j].athletic_result && counterAth <= 3) {
+                                if(threeOnTop[i].athletic_result === athleteList[j].athletic_result && counterAth < 3 && !athStatus && !athleteList[j].athletic_result_status) {
                                     athleteList[j].athletic_result_status = 1;
+                                    console.warn('==== b', athleteList[j])
                                     counterAth++;
+                                    athStatus = true;
                                 }
                             }
                         }
                     }
                 }
+
                 // calculate points for athlete
                 let technicalPoint = 0, 
                     athleticPoint = 0,
@@ -406,7 +425,7 @@ exports.getPointForScoreboard = (req, res) => {
                         })
                     }
                 }
-            } else if(athleteList.length > 7) {
+            } else if(athleteList.length > 5) {
                 return response.invalid(res, 'Points');
             } else {
                 return response.success(res, athleteList);
