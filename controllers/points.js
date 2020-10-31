@@ -118,7 +118,7 @@ exports.doPointsByUser = (req, res) => {
                                         finalResult = (finalTechnicalResult + finalAthleticResult).toFixed(2);
                                         
                                         // insert to table points
-                                        let qValidateInsertPoints = `SELECT *FROM points WHERE id_match=? AND id_atlet=?`;
+                                        let qValidateInsertPoints = `SELECT * FROM points WHERE id_match=? AND id_atlet=?`;
                                         conn.query(qValidateInsertPoints, [ matchId, athleteId ],
                                         (err, pointValidateList) => {
                                             if(err) {

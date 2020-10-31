@@ -74,23 +74,90 @@ exports.addAtletHth = (req, res) => {
     let value = [];
     let add = `INSERT INTO athlete (atlet_name, kontingen, class, kata_name, grouping, attribute, status) VALUES ?`;
 
-    payload.map((pay) => {
-        keys.map((key) => {
-            value.push([
-                payload[key].name,
-                payload[key].kontingen,
-                "none",
-                payload[key].kata,
-                payload[key].group,
-                payload[key].attribute,
-                0
-            ])
-        })
-    })
+    value.push([
+        payload.atlet_name,
+        payload.kontingen,
+        payload.class,
+        payload.kata_name,
+        payload.grouping,
+        payload.attribute,
+        payload.status
+    ])
 
     conn.query(add, [value], (err, result, field) => {
         if(!err) {
             response.success(res, result);
+        }
+        else {
+            res.status(422).send(err);
+        }
+    })
+}
+
+exports.truncateMatch = (req, res) => {
+    let queryPoint = "TRUNCATE `points`";
+    let queryDelete = "DELETE FROM `athlete` where grouping = ? ";
+    let group = "group final";
+
+    conn.query(queryPoint, [], (err,result,field) => {
+        if(!err) {
+            conn.query(queryDelete, [group], (err2, result2, field2) => {
+                if(!err) {
+                    response.success(res, result);
+                } else {
+                    res.status(422).send(err);
+                }
+            })
+        }
+        else {
+            res.status(422).send(err);
+        }
+    })
+}
+
+exports.trunscateAtlet = (req, res) => {
+    let queryAtlet = "TRUNCATE `athlete`";
+    let queryClass = "TRUNCATE `class`";
+    let queryMatch = "TRUNCATE `match`";
+    let queryPoints = "TRUNCATE `points`";
+    let queryResult = "TRUNCATE `result`";
+    let queryTatami = "TRUNCATE `tatami`";
+
+    conn.query(queryAtlet, [], (err, result, field) => {
+        if(!err) {
+            conn.query(queryClass, [], (err1, result1, field1) => {
+                if(!err1) {
+                    conn.query(queryMatch, [], (err2, result2, field2) => {
+                        if(!err2) {
+                            conn.query(queryPoints, [], (err3, result3, field3) => {
+                                if(!err3) {
+                                    conn.query(queryResult, [], (err4, result4, field4) => {
+                                        if(!err4) {
+                                            conn.query(queryTatami, [], (err5, result5, field5) => {
+                                                if(!err5) {
+                                                    response.success(res, result5);
+                                                }
+
+                                                else {
+                                                    res.status(422).send(err5);
+                                                }
+                                            })
+                                        } else {
+                                            res.status(422).send(err4);
+                                        }
+                                    })
+                                } else {
+                                    res.status(422).send(err3);
+                                }
+                            })
+                        } else {
+                            res.status(422).send(err2);
+                        }
+                    })
+                } else {
+                    res.status(422).send(err1);
+                }
+            })
         }
         else {
             res.status(422).send(err);
@@ -108,6 +175,7 @@ exports.addAtlet = (req, res) => {
     let addGroup = `INSERT INTO groups (group_name) VALUES ?`;
     let addAtlet = `INSERT INTO athlete (atlet_name, kontingen, class, kata_name, grouping, attribute, status) VALUES ?`;
     let getGroup = 'SELECT * from groups';
+    let addClass = `INSERT INTO class (name) VALUES ?`;
 
     keys.map((key) => {
       value.push([
